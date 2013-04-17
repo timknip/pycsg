@@ -20,8 +20,7 @@ setup(
     url='https://github.com/timknip/pycsg',
 
     install_requires = [],
-    package_dir={'csg': 'src'},
-    packages=['csg'],
+    packages=find_packages(),
     license = "MIT",
     classifiers=[
         "Development Status :: 4 - Beta",

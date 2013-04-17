@@ -59,12 +59,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   csg.CSG
-   csg.Node
-   csg.Plane
-   csg.Polygon
-   csg.Vector
-   csg.Vertex
+   csg.core.CSG
+   csg.geom.Node
+   csg.geom.Plane
+   csg.geom.Polygon
+   csg.geom.Vector
+   csg.geom.Vertex
    
 
 Indices and tables
