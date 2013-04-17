@@ -12,6 +12,8 @@ class CSG(object):
     
     Example usage::
     
+        from csg.core import CSG
+        
         cube = CSG.cube();
         sphere = CSG.sphere({'radius': 1.3});
         polygons = cube.subtract(sphere).toPolygons();

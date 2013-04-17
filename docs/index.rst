@@ -15,11 +15,14 @@ solids are correctly handled.
 
 Example usage::
 
+    from csg.core import CSG
+    
     cube = CSG.cube();
     sphere = CSG.sphere({'radius': 1.3});
     polygons = cube.subtract(sphere).toPolygons();
 
-## Implementation Details
+Implementation Details
+======================
 
 All CSG operations are implemented in terms of two functions, `clipTo()` and
 `invert()`, which remove parts of a BSP tree inside another BSP tree and swap
@@ -47,8 +50,8 @@ Subtraction and intersection naturally follow from set operations. If
 union is `A | B`, subtraction is `A - B = ~(~A | B)` and intersection is
 `A & B = ~(~A | ~B)` where `~` is the complement operator.
 
-## License
-
+License
+=======
 Copyright (c) 2011 Evan Wallace (http://madebyevan.com/), under the MIT license.
 
 Python port Copyright (c) 2012 Tim Knip (http://www.floorplanner.com), under the MIT license.

@@ -54,12 +54,16 @@ and is meant to serve as an easily understandable implementation of the
 algorithm. All edge cases involving overlapping coplanar polygons in both
 solids are correctly handled.</p>
 <p>Example usage:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cube</span> <span class="o">=</span> <span class="n">CSG</span><span class="o">.</span><span class="n">cube</span><span class="p">();</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">csg.core</span> <span class="kn">import</span> <span class="n">CSG</span>
+
+<span class="n">cube</span> <span class="o">=</span> <span class="n">CSG</span><span class="o">.</span><span class="n">cube</span><span class="p">();</span>
 <span class="n">sphere</span> <span class="o">=</span> <span class="n">CSG</span><span class="o">.</span><span class="n">sphere</span><span class="p">({</span><span class="s">&#39;radius&#39;</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">});</span>
 <span class="n">polygons</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span><span class="o">.</span><span class="n">toPolygons</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>## Implementation Details</p>
+</div>
+<div class="section" id="implementation-details">
+<h1>Implementation Details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h1>
 <p>All CSG operations are implemented in terms of two functions, <cite>clipTo()</cite> and
 <cite>invert()</cite>, which remove parts of a BSP tree inside another BSP tree and swap
 solid and empty space, respectively. To find the union of <cite>a</cite> and <cite>b</cite>, we
@@ -85,7 +89,9 @@ inverse of <cite>b</cite> against <cite>a</cite>. The code for union now looks l
 <p>Subtraction and intersection naturally follow from set operations. If
 union is <cite>A | B</cite>, subtraction is <cite>A - B = ~(~A | B)</cite> and intersection is
 <cite>A &amp; B = ~(~A | ~B)</cite> where <cite>~</cite> is the complement operator.</p>
-<p>## License</p>
+</div>
+<div class="section" id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2011 Evan Wallace (<a class="reference external" href="http://madebyevan.com/">http://madebyevan.com/</a>), under the MIT license.</p>
 <p>Python port Copyright (c) 2012 Tim Knip (<a class="reference external" href="http://www.floorplanner.com">http://www.floorplanner.com</a>), under the MIT license.</p>
 </div>
@@ -120,6 +126,8 @@ union is <cite>A | B</cite>, subtraction is <cite>A - B = ~(~A | B)</cite> and i
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Welcome to pycsg&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation Details</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#contents">Contents:</a><ul>
 </ul>
 </li>
@@ -128,7 +136,7 @@ union is <cite>A | B</cite>, subtraction is <cite>A - B = ~(~A | B)</cite> and i
 
   <h4>Next topic</h4>
   <p class="topless"><a href="csg.core.CSG.html"
-                        title="next chapter"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">csg.core.CSG</span></tt></a></p>
+                        title="next chapter"><tt class="docutils literal"><span class="pre">csg.core.CSG</span></tt></a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
