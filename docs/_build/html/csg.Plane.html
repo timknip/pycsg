@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>csg.Plane &mdash; pycsg 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pycsg 0.1 documentation" href="index.html" />
+    <link rel="next" title="csg.Polygon" href="csg.Polygon.html" />
+    <link rel="prev" title="csg.Node" href="csg.Node.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="csg.Polygon.html" title="csg.Polygon"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="csg.Node.html" title="csg.Node"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="csg-plane">
+<h1><tt class="docutils literal"><span class="pre">csg.Plane</span></tt><a class="headerlink" href="#csg-plane" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="csg.Plane">
+<em class="property">class </em><tt class="descclassname">csg.</tt><tt class="descname">Plane</tt><big>(</big><em>normal</em>, <em>w</em><big>)</big><a class="headerlink" href="#csg.Plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>class Plane</p>
+<p>Represents a plane in 3D space.</p>
+<dl class="attribute">
+<dt id="csg.Plane.EPSILON">
+<tt class="descname">EPSILON</tt><em class="property"> = 1e-05</em><a class="headerlink" href="#csg.Plane.EPSILON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="csg.Plane.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#csg.Plane.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="csg.Plane.flip">
+<tt class="descname">flip</tt><big>(</big><big>)</big><a class="headerlink" href="#csg.Plane.flip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="csg.Plane.fromPoints">
+<em class="property">classmethod </em><tt class="descname">fromPoints</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em><big>)</big><a class="headerlink" href="#csg.Plane.fromPoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="csg.Plane.splitPolygon">
+<tt class="descname">splitPolygon</tt><big>(</big><em>polygon</em>, <em>coplanarFront</em>, <em>coplanarBack</em>, <em>front</em>, <em>back</em><big>)</big><a class="headerlink" href="#csg.Plane.splitPolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split <cite>polygon</cite> by this plane if needed, then put the polygon or polygon
+fragments in the appropriate lists. Coplanar polygons go into either
+<cite>coplanarFront</cite> or <cite>coplanarBack</cite> depending on their orientation with
+respect to this plane. Polygons in front or in back of this plane go into
+either <cite>front</cite> or <cite>back</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="csg.Node.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">csg.Node</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="csg.Polygon.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">csg.Polygon</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/csg.Plane.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="csg.Polygon.html" title="csg.Polygon"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="csg.Node.html" title="csg.Node"
+             >previous</a> |</li>
+        <li><a href="index.html">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Tim Knip.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

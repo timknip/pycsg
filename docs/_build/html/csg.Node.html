@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>csg.Node &mdash; pycsg 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pycsg 0.1 documentation" href="index.html" />
+    <link rel="next" title="csg.Plane" href="csg.Plane.html" />
+    <link rel="prev" title="csg.CSG" href="csg.CSG.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="csg.Plane.html" title="csg.Plane"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="csg.CSG.html" title="csg.CSG"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="csg-node">
+<h1><tt class="docutils literal"><span class="pre">csg.Node</span></tt><a class="headerlink" href="#csg-node" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="csg.Node">
+<em class="property">class </em><tt class="descclassname">csg.</tt><tt class="descname">Node</tt><big>(</big><em>polygons=None</em><big>)</big><a class="headerlink" href="#csg.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>class Node</p>
+<p>Holds a node in a BSP tree. A BSP tree is built from a collection of polygons
+by picking a polygon to split along. That polygon (and all other coplanar
+polygons) are added directly to that node and the other polygons are added to
+the front and/or back subtrees. This is not a leafy BSP tree since there is
+no distinction between internal and leaf nodes.</p>
+<dl class="method">
+<dt id="csg.Node.allPolygons">
+<tt class="descname">allPolygons</tt><big>(</big><big>)</big><a class="headerlink" href="#csg.Node.allPolygons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all polygons in this BSP tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="csg.Node.build">
+<tt class="descname">build</tt><big>(</big><em>polygons</em><big>)</big><a class="headerlink" href="#csg.Node.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="csg.Node.clipPolygons">
+<tt class="descname">clipPolygons</tt><big>(</big><em>polygons</em><big>)</big><a class="headerlink" href="#csg.Node.clipPolygons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively remove all polygons in <cite>polygons</cite> that are inside this BSP
+tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="csg.Node.clipTo">
+<tt class="descname">clipTo</tt><big>(</big><em>bsp</em><big>)</big><a class="headerlink" href="#csg.Node.clipTo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all polygons in this BSP tree that are inside the other BSP tree
+<cite>bsp</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="csg.Node.clone">
+<tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#csg.Node.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="csg.Node.invert">
+<tt class="descname">invert</tt><big>(</big><big>)</big><a class="headerlink" href="#csg.Node.invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert solid space to empty space and empty space to solid space.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="csg.CSG.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">csg.CSG</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="csg.Plane.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">csg.Plane</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/csg.Node.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="csg.Plane.html" title="csg.Plane"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="csg.CSG.html" title="csg.CSG"
+             >previous</a> |</li>
+        <li><a href="index.html">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Tim Knip.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to pycsg’s documentation! &mdash; pycsg 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pycsg 0.1 documentation" href="#" />
+    <link rel="next" title="csg.CSG" href="csg.CSG.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="csg.CSG.html" title="csg.CSG"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-pycsg-s-documentation">
+<h1>Welcome to pycsg&#8217;s documentation!<a class="headerlink" href="#welcome-to-pycsg-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Constructive Solid Geometry (CSG) is a modeling technique that uses Boolean
+operations like union and intersection to combine 3D solids. This library
+implements CSG operations on meshes elegantly and concisely using BSP trees,
+and is meant to serve as an easily understandable implementation of the
+algorithm. All edge cases involving overlapping coplanar polygons in both
+solids are correctly handled.</p>
+<p>Example usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cube</span> <span class="o">=</span> <span class="n">CSG</span><span class="o">.</span><span class="n">cube</span><span class="p">();</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="n">CSG</span><span class="o">.</span><span class="n">sphere</span><span class="p">({</span><span class="s">&#39;radius&#39;</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">});</span>
+<span class="n">polygons</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span><span class="o">.</span><span class="n">toPolygons</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>## Implementation Details</p>
+<p>All CSG operations are implemented in terms of two functions, <cite>clipTo()</cite> and
+<cite>invert()</cite>, which remove parts of a BSP tree inside another BSP tree and swap
+solid and empty space, respectively. To find the union of <cite>a</cite> and <cite>b</cite>, we
+want to remove everything in <cite>a</cite> inside <cite>b</cite> and everything in <cite>b</cite> inside <cite>a</cite>,
+then combine polygons from <cite>a</cite> and <cite>b</cite> into one solid:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">a</span><span class="o">.</span><span class="n">clipTo</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="n">b</span><span class="o">.</span><span class="n">clipTo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="n">a</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">allPolygons</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>The only tricky part is handling overlapping coplanar polygons in both trees.
+The code above keeps both copies, but we need to keep them in one tree and
+remove them in the other tree. To remove them from <cite>b</cite> we can clip the
+inverse of <cite>b</cite> against <cite>a</cite>. The code for union now looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">a</span><span class="o">.</span><span class="n">clipTo</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="n">b</span><span class="o">.</span><span class="n">clipTo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="n">b</span><span class="o">.</span><span class="n">invert</span><span class="p">();</span>
+<span class="n">b</span><span class="o">.</span><span class="n">clipTo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="n">b</span><span class="o">.</span><span class="n">invert</span><span class="p">();</span>
+<span class="n">a</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">allPolygons</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>Subtraction and intersection naturally follow from set operations. If
+union is <cite>A | B</cite>, subtraction is <cite>A - B = ~(~A | B)</cite> and intersection is
+<cite>A &amp; B = ~(~A | ~B)</cite> where <cite>~</cite> is the complement operator.</p>
+<p>## License</p>
+<p>Copyright (c) 2011 Evan Wallace (<a class="reference external" href="http://madebyevan.com/">http://madebyevan.com/</a>), under the MIT license.</p>
+<p>Python port Copyright (c) 2012 Tim Knip (<a class="reference external" href="http://www.floorplanner.com">http://www.floorplanner.com</a>), under the MIT license.</p>
+</div>
+<div class="section" id="contents">
+<h1>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="csg.CSG.html"><tt class="docutils literal"><span class="pre">csg.CSG</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="csg.Node.html"><tt class="docutils literal"><span class="pre">csg.Node</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="csg.Plane.html"><tt class="docutils literal"><span class="pre">csg.Plane</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="csg.Polygon.html"><tt class="docutils literal"><span class="pre">csg.Polygon</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="csg.Vector.html"><tt class="docutils literal"><span class="pre">csg.Vector</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="csg.Vertex.html"><tt class="docutils literal"><span class="pre">csg.Vertex</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to pycsg&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#contents">Contents:</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="csg.CSG.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">csg.CSG</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="csg.CSG.html" title="csg.CSG"
+             >next</a> |</li>
+        <li><a href="#">pycsg 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Tim Knip.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
