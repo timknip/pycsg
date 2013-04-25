@@ -1,2 +1,1 @@
 include *.md
-recursive-include docs *.*
