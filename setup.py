@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name='pycsg',
-    version='0.1',
+    version='0.2',
     description='Constructive Solid Geometry (CSG)',
     long_description=read('README.md'),
     keywords = "constructive solid geometry csg utilities",
@@ -19,7 +19,10 @@ setup(
     author_email='tim@floorplanner.com',
     url='https://github.com/timknip/pycsg',
 
-    install_requires = [],
+    install_requires = [
+        "PyOpenGL>=3.0.2",
+        "PyOpenGL_accelerate>=3.0.2",
+    ],
     packages=find_packages(),
     license = "MIT",
     classifiers=[
