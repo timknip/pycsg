@@ -19,10 +19,7 @@ setup(
     author_email='tim@floorplanner.com',
     url='https://github.com/timknip/pycsg',
 
-    install_requires = [
-        "PyOpenGL>=3.0.2",
-        "PyOpenGL_accelerate>=3.0.2",
-    ],
+    install_requires = [],
     packages=find_packages(),
     license = "MIT",
     classifiers=[

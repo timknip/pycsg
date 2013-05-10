@@ -8,3 +8,10 @@ and is meant to serve as an easily understandable implementation of the
 algorithm. All edge cases involving overlapping coplanar polygons in both
 solids are correctly handled.
 
+examples
+========
+$ python examples/pyopengl
+
+depends on:
+PyOpenGL
+PyOpenGL_accelerate
