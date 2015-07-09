@@ -24,6 +24,10 @@ class TestCSG(unittest.TestCase):
         bPolys = b.toPolygons()
         c = CSG.cylinder()
         cPolys = c.toPolygons()
+
+    def test_sphere(self):
+        a = CSG.sphere(center=[0., 0., 0.], radius=1., slices=4, stacks=3)
+        a.saveVTK('test_sphere.vtk')
         
     def test_cube_intersect(self):
         a = CSG.cube()
@@ -39,6 +43,21 @@ class TestCSG(unittest.TestCase):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
         a.subtract(b).saveVTK('test_cube_subtract.vtk')
+
+    def test_sphere_cylinder_intersect(self):
+        a = CSG.sphere(center=[0.5, 0.5, 0.5], radius=0.5, slices=8, stacks=4)
+        b = CSG.cylinder(start=[0.,0.,0.], end=[1.,0.,0.], radius=0.3, slices=16)
+        a.intersect(b).saveVTK('test_sphere_cylinder_intersect.vtk')
+
+    def test_sphere_cylinder_union(self):
+        a = CSG.sphere(center=[0.5, 0.5, 0.5], radius=0.5, slices=8, stacks=4)
+        b = CSG.cylinder(start=[0.,0.,0.], end=[1.,0.,0.], radius=0.3, slices=16)
+        a.union(b).saveVTK('test_sphere_cylinder_union.vtk')
+
+    def test_sphere_cylinder_subtract(self):
+        a = CSG.sphere(center=[0.5, 0.5, 0.5], radius=0.5, slices=8, stacks=4)
+        b = CSG.cylinder(start=[0.,0.,0.], end=[1.,0.,0.], radius=0.3, slices=16)
+        a.subtract(b).saveVTK('test_sphere_cylinder_subtract.vtk')
         
 if __name__ == '__main__':
     unittest.main()
