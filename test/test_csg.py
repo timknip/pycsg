@@ -19,6 +19,7 @@ class TestCSG(unittest.TestCase):
         
     def test_intersect(self):
         a = CSG.cube()
+        a.saveVTK('a.vtk')
         b = CSG.cube([0.5, 0.5, 0.0])
         polygons = a.intersect(b).toPolygons()
         print polygons
