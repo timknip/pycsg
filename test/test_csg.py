@@ -17,7 +17,21 @@ class TestCSG(unittest.TestCase):
     def test_cs(self):
         print 'ss'
         
-    def test_csg(self):
+    def test_intersect(self):
+        a = CSG.cube()
+        b = CSG.cube([0.5, 0.5, 0.0])
+        polygons = a.intersect(b).toPolygons()
+        print polygons
+        print Vector
+
+    def test_union(self):
+        a = CSG.cube()
+        b = CSG.cube([0.5, 0.5, 0.0])
+        polygons = a.union(b).toPolygons()
+        print polygons
+        print Vector
+
+    def test_subtract(self):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
         polygons = a.subtract(b).toPolygons()
