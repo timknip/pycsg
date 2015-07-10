@@ -81,6 +81,10 @@ class TestCSG(unittest.TestCase):
         notch2 = CSG.cube(center=[-0.10, 0., 0.], radius=[0.02, 0.02, 0.20])
         bolt = shaft + head - notch1 - notch2
         bolt.saveVTK('test_bolt.vtk')
+
+    def test_translate(self):
+        a = CSG.cube()
+        b = a.translate([0.1, 0.2, 0.3])
         
 if __name__ == '__main__':
     unittest.main()

@@ -52,6 +52,7 @@ class CSG(object):
     Copyright (c) 2011 Evan Wallace (http://madebyevan.com/), under the MIT license.
     
     Python port Copyright (c) 2012 Tim Knip (http://www.floorplanner.com), under the MIT license.
+    Additions by Alex Pletzer The Pennsylvania University
     """
     def __init__(self):
         self.polygons = []
@@ -69,6 +70,40 @@ class CSG(object):
         
     def toPolygons(self):
         return self.polygons
+
+    def translate(self, disp):
+        """
+        Translate Geometry
+           disp: displacement (array of floats)
+        """
+        d = Vector(disp[0], disp[1], disp[2])
+        for poly in self.polygons:
+            for v in poly.vertices:
+                v.pos = v.pos.plus(d)
+                # no change to the normals
+
+    def rotate(self, axis, angleDeg):
+        """
+        Rotate geometry 
+           axis: axis of rotation (array of floats)
+           angleDeg: rotation angle in degrees
+        """
+        a = Vector(axis[0], axis[1], axis[2]).unit()
+        cosAngle = math.cos(math.pi * angleDeg / 180.)
+        sinAngle = math.sin(math.pi * angleDeg / 180.)
+
+        def newVector(v):
+            vA = v.dot(a)
+            vPerp = v.minus(a.times(vA))
+            u1 = v.minus(a.times(vA)).unit()
+            u2 = u1.cross(a)
+            vPerpLen = vPerp.length()
+            return a.times(vA).plus(u1.times(vPerpLen*cosAngle).plus(u2.times(vPerpLen*sinAngle)))
+
+        for poly in self.polygons:
+            for vert in poly.vertices:
+                vert.pos = newVector(vert.pos)
+                vert.normal = newVector(vert.normal)
     
     def toVerticesAndPolygons(self):
         """
