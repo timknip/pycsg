@@ -284,9 +284,7 @@ class CSG(object):
         slices = kwargs.get('slices', 16)
         stacks = kwargs.get('stacks', 8)
         polygons = []
-        sl = float(slices)
-        st = float(stacks)
-        def vertex(vertices, theta, phi):
+        def appendVertex(vertices, theta, phi):
             d = Vector(
                 math.cos(theta) * math.sin(phi),
                 math.cos(phi),
@@ -298,12 +296,12 @@ class CSG(object):
         for i in range(0, slices):
             for j in range(0, stacks):
                 vertices = []
-                vertex(vertices, i * dTheta, j * dPhi)
+                appendVertex(vertices, i * dTheta, j * dPhi)
                 if j > 0:
-                    vertex(vertices, (i + 1) * dTheta, j * dPhi)
+                    appendVertex(vertices, (i + 1) * dTheta, j * dPhi)
                 if j < stacks - 1:
-                    vertex(vertices, (i + 1) * dTheta, (j + 1) * dPhi)
-                vertex(vertices, i * dTheta, (j + 1) * dPhi)
+                    appendVertex(vertices, (i + 1) * dTheta, (j + 1) * dPhi)
+                appendVertex(vertices, i * dTheta, (j + 1) * dPhi)
                 polygons.append(Polygon(vertices))
                 
         return CSG.fromPolygons(polygons)
