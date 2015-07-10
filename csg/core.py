@@ -73,7 +73,7 @@ class CSG(object):
 
     def translate(self, disp):
         """
-        Translate Geometry
+        Translate Geometry.
            disp: displacement (array of floats)
         """
         d = Vector(disp[0], disp[1], disp[2])
@@ -84,7 +84,7 @@ class CSG(object):
 
     def rotate(self, axis, angleDeg):
         """
-        Rotate geometry 
+        Rotate geometry.
            axis: axis of rotation (array of floats)
            angleDeg: rotation angle in degrees
         """
@@ -111,7 +111,7 @@ class CSG(object):
         """
         Return list of vertices, polygons (cells), and the total
         number of vertex indices in the polygon connectivity list
-        (count)
+        (count).
         """
         verts = []
         polys = []
@@ -386,14 +386,14 @@ class CSG(object):
         for i in range(0, slices):
             t0 = i * dt
             t1 = (i + 1) * dt
-            polygons.append(Polygon([start, 
+            polygons.append(Polygon([start.clone(), 
                                      point(0., t0, -1.), 
                                      point(0., t1, -1.)]))
             polygons.append(Polygon([point(0., t1, 0.), 
                                      point(0., t0, 0.),
                                      point(1., t0, 0.), 
                                      point(1., t1, 0.)]))
-            polygons.append(Polygon([end, 
+            polygons.append(Polygon([end.clone(), 
                                      point(1., t1, 1.), 
                                      point(1., t0, 1.)]))
         
@@ -453,7 +453,7 @@ class CSG(object):
             # average normal for the tip
             nAvg = n0.plus(n1).times(0.5)
             # polygon on the low side (disk sector)
-            polyStart = Polygon([start, 
+            polyStart = Polygon([start.clone(), 
                                  Vertex(p0, startNormal), 
                                  Vertex(p1, startNormal)])
             polygons.append(polyStart)

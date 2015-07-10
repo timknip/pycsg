@@ -82,17 +82,23 @@ class TestCSG(unittest.TestCase):
         bolt = shaft + head - notch1 - notch2
         bolt.saveVTK('test_bolt.vtk')
 
-    def test_translate(self):
+    def test_translate_cube(self):
         a = CSG.cube()
         a.saveVTK('a.vtk')
-        a.translate([0.1, 0.2, 0.3])
+        a.translate(disp=[0.1, 0.2, 0.3])
         a.saveVTK('aTranslated.vtk')
 
-    def test_rotate_Cube(self):
+    def test_rotate_cube(self):
         a = CSG.cube()
         a.saveVTK('a.vtk')
         a.rotate(axis=[0.1, 0.2, 0.3], angleDeg=20.0)
         a.saveVTK('aRotated.vtk')
+
+    def test_translate_cylinder(self):
+        b = CSG.cylinder()
+        b.saveVTK('b.vtk')
+        b.translate(disp=[0.1, 0.2, 0.3])
+        b.saveVTK('bTranslated.vtk')
 
     def test_rotate_cylinder(self):
         b = CSG.cylinder()
