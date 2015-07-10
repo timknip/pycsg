@@ -287,23 +287,23 @@ class CSG(object):
         sl = float(slices)
         st = float(stacks)
         def vertex(vertices, theta, phi):
-            theta *= math.pi * 2.0
-            phi *= math.pi
             d = Vector(
                 math.cos(theta) * math.sin(phi),
                 math.cos(phi),
                 math.sin(theta) * math.sin(phi))
             vertices.append(Vertex(c.plus(d.times(r)), d))
             
+        dTheta = math.pi * 2.0 / float(slices)
+        dPhi = math.pi / float(stacks)
         for i in range(0, slices):
             for j in range(0, stacks):
                 vertices = []
-                vertex(vertices, i / sl, j / st)
+                vertex(vertices, i * dTheta, j * dPhi)
                 if j > 0:
-                    vertex(vertices, (i + 1) / sl, j / st)
+                    vertex(vertices, (i + 1) * dTheta, j * dPhi)
                 if j < stacks - 1:
-                    vertex(vertices, (i + 1) / sl, (j + 1) / st)
-                vertex(vertices, i / sl, (j + 1) / st)
+                    vertex(vertices, (i + 1) * dTheta, (j + 1) * dPhi)
+                vertex(vertices, i * dTheta, (j + 1) * dPhi)
                 polygons.append(Polygon(vertices))
                 
         return CSG.fromPolygons(polygons)
