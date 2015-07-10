@@ -40,17 +40,20 @@ class TestCSG(unittest.TestCase):
     def test_cube_intersect(self):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
-        a.intersect(b).saveVTK('test_cube_intersect.vtk')
+        c = a * b
+        c.saveVTK('test_cube_intersect.vtk')
 
     def test_cube_union(self):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
-        a.union(b).saveVTK('test_cube_union.vtk')
+        c = a + b
+        c.saveVTK('test_cube_union.vtk')
 
     def test_cube_subtract(self):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
-        a.subtract(b).saveVTK('test_cube_subtract.vtk')
+        c = a - b
+        c.saveVTK('test_cube_subtract.vtk')
 
     def test_sphere_cylinder_intersect(self):
         a = CSG.sphere(center=[0.5, 0.5, 0.5], radius=0.5, slices=8, stacks=4)

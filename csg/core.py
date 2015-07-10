@@ -146,6 +146,9 @@ class CSG(object):
         b.invert()
         a.build(b.allPolygons());
         return CSG.fromPolygons(a.allPolygons())
+
+    def __add__(self, csg):
+        return self.union(csg)
         
     def subtract(self, csg):
         """
@@ -174,6 +177,9 @@ class CSG(object):
         a.build(b.allPolygons())
         a.invert()
         return CSG.fromPolygons(a.allPolygons())
+
+    def __sub__(self, csg):
+        return self.subtract(csg)
         
     def intersect(self, csg):
         """
@@ -201,6 +207,9 @@ class CSG(object):
         a.build(b.allPolygons())
         a.invert()
         return CSG.fromPolygons(a.allPolygons())
+
+    def __mul__(self, csg):
+        return self.intersect(csg)
         
     def inverse(self):
         """
