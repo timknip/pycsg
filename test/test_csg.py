@@ -73,6 +73,14 @@ class TestCSG(unittest.TestCase):
         a = CSG.sphere(center=[0.5, 0.5, 0.5], radius=0.5, slices=8, stacks=4)
         b = CSG.cylinder(start=[0.,0.,0.], end=[1.,0.,0.], radius=0.3, slices=16)
         a.subtract(b).saveVTK('test_sphere_cylinder_subtract.vtk')
+
+    def test_bolt(self):
+        shaft = CSG.cylinder(start=[0., 0., 0.], end=[1., 0., 0.], radius=0.1, slices=32)
+        head = CSG.cone(start=[-0.12, 0., 0.], end=[0.10, 0., 0.], radius=0.25)
+        notch1 = CSG.cube(center=[-0.10, 0., 0.], radius=[0.02, 0.20, 0.02])
+        notch2 = CSG.cube(center=[-0.10, 0., 0.], radius=[0.02, 0.02, 0.20])
+        bolt = shaft + head - notch1 - notch2
+        bolt.saveVTK('test_bolt.vtk')
         
 if __name__ == '__main__':
     unittest.main()
