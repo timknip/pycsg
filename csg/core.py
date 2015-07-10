@@ -219,7 +219,7 @@ class CSG(object):
         csg = self.clone()
         map(lambda p: p.flip(), csg.polygons)
         return csg
-    
+
     @classmethod
     def cube(cls, center=[0,0,0], radius=[1,1,1]):
         """
@@ -339,8 +339,7 @@ class CSG(object):
         end = Vertex(e, axisZ.unit())
         polygons = []
         
-        def point(stack, slice, normalBlend):
-            angle = slice * math.pi * 2.0
+        def point(stack, angle, normalBlend):
             out = axisX.times(math.cos(angle)).plus(
                 axisY.times(math.sin(angle)))
             pos = s.plus(ray.times(stack)).plus(out.times(r))
@@ -348,14 +347,19 @@ class CSG(object):
                 axisZ.times(normalBlend))
             return Vertex(pos, normal)
             
+        dt = math.pi * 2.0 / float(slices)
         for i in range(0, slices):
-            t0 = i / float(slices)
-            t1 = (i + 1) / float(slices)
-            polygons.append(Polygon([start, point(0., t0, -1.), 
+            t0 = i * dt
+            t1 = (i + 1) * dt
+            polygons.append(Polygon([start, 
+                                     point(0., t0, -1.), 
                                      point(0., t1, -1.)]))
-            polygons.append(Polygon([point(0., t1, 0.), point(0., t0, 0.),
-                                     point(1., t0, 0.), point(1., t1, 0.)]))
-            polygons.append(Polygon([end, point(1., t1, 1.), 
+            polygons.append(Polygon([point(0., t1, 0.), 
+                                     point(0., t0, 0.),
+                                     point(1., t0, 0.), 
+                                     point(1., t1, 0.)]))
+            polygons.append(Polygon([end, 
+                                     point(1., t1, 1.), 
                                      point(1., t0, 1.)]))
         
         return CSG.fromPolygons(polygons)
