@@ -87,6 +87,18 @@ class TestCSG(unittest.TestCase):
         a.saveVTK('a.vtk')
         a.translate([0.1, 0.2, 0.3])
         a.saveVTK('aTranslated.vtk')
+
+    def test_rotate_Cube(self):
+        a = CSG.cube()
+        a.saveVTK('a.vtk')
+        a.rotate(axis=[0.1, 0.2, 0.3], angleDeg=20.0)
+        a.saveVTK('aRotated.vtk')
+
+    def test_rotate_cylinder(self):
+        b = CSG.cylinder()
+        b.saveVTK('b.vtk')
+        b.rotate(axis=[0.1, 0.2, 0.3], angleDeg=20.0)
+        b.saveVTK('bRotated.vtk')
         
 if __name__ == '__main__':
     unittest.main()

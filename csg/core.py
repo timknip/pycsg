@@ -103,7 +103,9 @@ class CSG(object):
         for poly in self.polygons:
             for vert in poly.vertices:
                 vert.pos = newVector(vert.pos)
-                vert.normal = newVector(vert.normal)
+                normal = vert.normal
+                if normal.length() > 0:
+                    vert.normal = newVector(vert.normal)
     
     def toVerticesAndPolygons(self):
         """
