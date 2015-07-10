@@ -25,6 +25,10 @@ class TestCSG(unittest.TestCase):
         c = CSG.cylinder()
         cPolys = c.toPolygons()
 
+    def test_cone(self):
+        a = CSG.cone(start=[0., 0., 0.], end=[1., 2., 3.], radius=1.0, slices=8)
+        a.saveVTK('test_cone.vtk')
+
     def test_cube(self):
         a = CSG.cube(center=[0., 0., 0.], radius=[1., 2., 3.])
         a.saveVTK('test_cube.vtk')
