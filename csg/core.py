@@ -69,38 +69,50 @@ class CSG(object):
         
     def toPolygons(self):
         return self.polygons
+    
+    def toVerticesAndPolygons(self):
+        """
+        Return list of vertices, polygons (cells), and the total
+        number of vertex indices in the polygon connectivity list
+        (count)
+        """
+        verts = []
+        polys = []
+        vertexIndexMap = {}
+        count = 0
+        for poly in self.polygons:
+            verts = poly.vertices
+            cell = []
+            for v in poly.vertices:
+                p = v.pos
+                vKey = (p[0], p[1], p[2])
+                if not vertexIndexMap.has_key(vKey):
+                    vertexIndexMap[vKey] = len(vertexIndexMap)
+                index = vertexIndexMap[vKey]
+                cell.append(index)
+                count += 1
+            polys.append(cell)
+        # sort by index
+        sortedVertexIndex = sorted(vertexIndexMap.items(),
+                                   key=operator.itemgetter(1))
+        verts = [v[0] for v in sortedVertexIndex]
+        return verts, polys, count
 
     def saveVTK(self, filename):
         """
-        Save polygons to a VTK file.
+        Save polygons in VTK file.
         """
         f = file(filename, 'w')
         print >> f, '# vtk DataFile Version 3.0'
         print >> f, 'pycsg output'
         print >> f, 'ASCII'
         print >> f, 'DATASET POLYDATA'
+        
+        verts, cells, count = self.toVerticesAndPolygons()
 
-        # collect all the points and the cells
-	vertexIndexMap = {}
-        cells = []
-        count = 0
-        for poly in self.polygons:
-            verts = poly.vertices
-	    cell = []
-            for v in verts:
-                p = v.pos
-                vKey = '{} {} {}'.format(p[0], p[1], p[2])
-                if not vertexIndexMap.has_key(vKey):
-                    vertexIndexMap[vKey] = len(vertexIndexMap)
-                index = vertexIndexMap[vKey]
-                cell.append(index)
-                count += 1
-            cells.append(cell)
-        # sort by index
-        sortedVertexIndex = sorted(vertexIndexMap.items(), key=operator.itemgetter(1))
-        print >> f, 'POINTS {} float'.format(len(sortedVertexIndex))
-        for v in sortedVertexIndex:
-            print >> f, v[0]
+        print >> f, 'POINTS {} float'.format(len(verts))
+        for v in verts:
+            print >> f, '{} {} {}'.format(v[0], v[1], v[2])
         numCells = len(cells)
         print >> f, 'POLYGONS {} {}'.format(numCells, count + numCells)
         for cell in cells:
