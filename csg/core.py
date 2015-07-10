@@ -396,12 +396,12 @@ class CSG(object):
         taperAngle = math.atan2(r, ray.length())
         sinTaperAngle = math.sin(taperAngle)
         cosTaperAngle = math.cos(taperAngle)
-        axisZNormComp = axisZ.times(sinTaperAngle)
-
         def point(angle):
+            # radial direction pointing out
             out = axisX.times(math.cos(angle)).plus(
                 axisY.times(math.sin(angle)))
             pos = s.plus(out.times(r))
+            # normal taking into account the tapering of the cone
             normal = out.times(cosTaperAngle).plus(axisZ.times(sinTaperAngle))
             return pos, normal
 
@@ -409,11 +409,18 @@ class CSG(object):
         for i in range(0, slices):
             t0 = i * dt
             t1 = (i + 1) * dt
+            # coordinates and associated normal pointing outwards of the cone's
+            # side
             p0, n0 = point(t0)
             p1, n1 = point(t1)
+            # average normal for the tip
             nAvg = n0.plus(n1).times(0.5)
-            polyStart = Polygon([start, Vertex(p0, startNormal), Vertex(p1, startNormal)])
+            # polygon on the low side (disk sector)
+            polyStart = Polygon([start, 
+                                 Vertex(p0, startNormal), 
+                                 Vertex(p1, startNormal)])
             polygons.append(polyStart)
+            # polygon extending from the low side to the tip
             polySide = Polygon([Vertex(p0, n0), Vertex(e, nAvg), Vertex(p1, n1)])
             polygons.append(polySide)
 
