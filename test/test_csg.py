@@ -84,7 +84,9 @@ class TestCSG(unittest.TestCase):
 
     def test_translate(self):
         a = CSG.cube()
-        b = a.translate([0.1, 0.2, 0.3])
+        a.saveVTK('a.vtk')
+        a.translate([0.1, 0.2, 0.3])
+        a.saveVTK('aTranslated.vtk')
         
 if __name__ == '__main__':
     unittest.main()
