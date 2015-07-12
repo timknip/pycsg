@@ -52,7 +52,7 @@ class CSG(object):
     Copyright (c) 2011 Evan Wallace (http://madebyevan.com/), under the MIT license.
     
     Python port Copyright (c) 2012 Tim Knip (http://www.floorplanner.com), under the MIT license.
-    Additions by Alex Pletzer The Pennsylvania University
+    Additions by Alex Pletzer The Pennsylvania State University
     """
     def __init__(self):
         self.polygons = []
