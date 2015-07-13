@@ -54,8 +54,9 @@ class TestCSG(unittest.TestCase):
         c.saveVTK('test_cube_union.vtk')
 
     def test_sphere_union(self):
-        a = CSG.sphere(center=(0., 0., 0.), radius=1.0)
-        b = CSG.sphere(center=(2., 0., 0.), radius=1.0)
+        # this test currently fails
+        a = CSG.sphere(center=(0., 0., 0.), radius=1.0, slices=32, stacks=16)
+        b = CSG.sphere(center=(2., 0., 0.), radius=1.0, slices=32, stacks=16)
         c = a + b
         c.saveVTK('test_sphere_union.vtk')
 
