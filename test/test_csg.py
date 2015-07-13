@@ -53,6 +53,12 @@ class TestCSG(unittest.TestCase):
         c = a + b
         c.saveVTK('test_cube_union.vtk')
 
+    def test_sphere_union(self):
+        a = CSG.sphere(center=(0., 0., 0.), radius=1.0)
+        b = CSG.sphere(center=(2., 0., 0.), radius=1.0)
+        c = a + b
+        c.saveVTK('test_sphere_union.vtk')
+
     def test_cube_subtract(self):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
