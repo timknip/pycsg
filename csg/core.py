@@ -1,4 +1,5 @@
 import math
+import operator
 from geom import *
 
 class CSG(object):
@@ -51,6 +52,7 @@ class CSG(object):
     Copyright (c) 2011 Evan Wallace (http://madebyevan.com/), under the MIT license.
     
     Python port Copyright (c) 2012 Tim Knip (http://www.floorplanner.com), under the MIT license.
+    Additions by Alex Pletzer The Pennsylvania University
     """
     def __init__(self):
         self.polygons = []
@@ -68,6 +70,93 @@ class CSG(object):
         
     def toPolygons(self):
         return self.polygons
+
+    def translate(self, disp):
+        """
+        Translate Geometry.
+           disp: displacement (array of floats)
+        """
+        d = Vector(disp[0], disp[1], disp[2])
+        for poly in self.polygons:
+            for v in poly.vertices:
+                v.pos = v.pos.plus(d)
+                # no change to the normals
+
+    def rotate(self, axis, angleDeg):
+        """
+        Rotate geometry.
+           axis: axis of rotation (array of floats)
+           angleDeg: rotation angle in degrees
+        """
+        a = Vector(axis[0], axis[1], axis[2]).unit()
+        cosAngle = math.cos(math.pi * angleDeg / 180.)
+        sinAngle = math.sin(math.pi * angleDeg / 180.)
+
+        def newVector(v):
+            vA = v.dot(a)
+            vPerp = v.minus(a.times(vA))
+            u1 = v.minus(a.times(vA)).unit()
+            u2 = u1.cross(a)
+            vPerpLen = vPerp.length()
+            return a.times(vA).plus(u1.times(vPerpLen*cosAngle).plus(u2.times(vPerpLen*sinAngle)))
+
+        for poly in self.polygons:
+            for vert in poly.vertices:
+                vert.pos = newVector(vert.pos)
+                normal = vert.normal
+                if normal.length() > 0:
+                    vert.normal = newVector(vert.normal)
+    
+    def toVerticesAndPolygons(self):
+        """
+        Return list of vertices, polygons (cells), and the total
+        number of vertex indices in the polygon connectivity list
+        (count).
+        """
+        verts = []
+        polys = []
+        vertexIndexMap = {}
+        count = 0
+        for poly in self.polygons:
+            verts = poly.vertices
+            cell = []
+            for v in poly.vertices:
+                p = v.pos
+                vKey = (p[0], p[1], p[2])
+                if not vertexIndexMap.has_key(vKey):
+                    vertexIndexMap[vKey] = len(vertexIndexMap)
+                index = vertexIndexMap[vKey]
+                cell.append(index)
+                count += 1
+            polys.append(cell)
+        # sort by index
+        sortedVertexIndex = sorted(vertexIndexMap.items(),
+                                   key=operator.itemgetter(1))
+        verts = [v[0] for v in sortedVertexIndex]
+        return verts, polys, count
+
+    def saveVTK(self, filename):
+        """
+        Save polygons in VTK file.
+        """
+        f = file(filename, 'w')
+        print >> f, '# vtk DataFile Version 3.0'
+        print >> f, 'pycsg output'
+        print >> f, 'ASCII'
+        print >> f, 'DATASET POLYDATA'
+        
+        verts, cells, count = self.toVerticesAndPolygons()
+
+        print >> f, 'POINTS {} float'.format(len(verts))
+        for v in verts:
+            print >> f, '{} {} {}'.format(v[0], v[1], v[2])
+        numCells = len(cells)
+        print >> f, 'POLYGONS {} {}'.format(numCells, count + numCells)
+        for cell in cells:
+            print >> f, '{} '.format(len(cell)),
+            for index in cell:
+                print >> f, '{} '.format(index),
+            print >> f
         
     def union(self, csg):
         """
@@ -94,6 +183,9 @@ class CSG(object):
         b.invert()
         a.build(b.allPolygons());
         return CSG.fromPolygons(a.allPolygons())
+
+    def __add__(self, csg):
+        return self.union(csg)
         
     def subtract(self, csg):
         """
@@ -122,6 +214,9 @@ class CSG(object):
         a.build(b.allPolygons())
         a.invert()
         return CSG.fromPolygons(a.allPolygons())
+
+    def __sub__(self, csg):
+        return self.subtract(csg)
         
     def intersect(self, csg):
         """
@@ -149,6 +244,9 @@ class CSG(object):
         a.build(b.allPolygons())
         a.invert()
         return CSG.fromPolygons(a.allPolygons())
+
+    def __mul__(self, csg):
+        return self.intersect(csg)
         
     def inverse(self):
         """
@@ -158,7 +256,7 @@ class CSG(object):
         csg = self.clone()
         map(lambda p: p.flip(), csg.polygons)
         return csg
-    
+
     @classmethod
     def cube(cls, center=[0,0,0], radius=[1,1,1]):
         """
@@ -223,26 +321,24 @@ class CSG(object):
         slices = kwargs.get('slices', 16)
         stacks = kwargs.get('stacks', 8)
         polygons = []
-        sl = float(slices)
-        st = float(stacks)
-        def vertex(vertices, theta, phi):
-            theta *= math.pi * 2.0
-            phi *= math.pi
+        def appendVertex(vertices, theta, phi):
             d = Vector(
                 math.cos(theta) * math.sin(phi),
                 math.cos(phi),
                 math.sin(theta) * math.sin(phi))
             vertices.append(Vertex(c.plus(d.times(r)), d))
             
+        dTheta = math.pi * 2.0 / float(slices)
+        dPhi = math.pi / float(stacks)
         for i in range(0, slices):
             for j in range(0, stacks):
                 vertices = []
-                vertex(vertices, i / sl, j / st)
+                appendVertex(vertices, i * dTheta, j * dPhi)
                 if j > 0:
-                    vertex(vertices, (i + 1) / sl, j / st)
+                    appendVertex(vertices, (i + 1) * dTheta, j * dPhi)
                 if j < stacks - 1:
-                    vertex(vertices, (i + 1) / sl, (j + 1) / st)
-                vertex(vertices, i / sl, (j + 1) / st)
+                    appendVertex(vertices, (i + 1) * dTheta, (j + 1) * dPhi)
+                appendVertex(vertices, i * dTheta, (j + 1) * dPhi)
                 polygons.append(Polygon(vertices))
                 
         return CSG.fromPolygons(polygons)
@@ -278,8 +374,7 @@ class CSG(object):
         end = Vertex(e, axisZ.unit())
         polygons = []
         
-        def point(stack, slice, normalBlend):
-            angle = slice * math.pi * 2.0
+        def point(stack, angle, normalBlend):
             out = axisX.times(math.cos(angle)).plus(
                 axisY.times(math.sin(angle)))
             pos = s.plus(ray.times(stack)).plus(out.times(r))
@@ -287,14 +382,83 @@ class CSG(object):
                 axisZ.times(normalBlend))
             return Vertex(pos, normal)
             
+        dt = math.pi * 2.0 / float(slices)
         for i in range(0, slices):
-            t0 = i / float(slices)
-            t1 = (i + 1) / float(slices)
-            polygons.append(Polygon([start, point(0., t0, -1.), 
+            t0 = i * dt
+            t1 = (i + 1) * dt
+            polygons.append(Polygon([start.clone(), 
+                                     point(0., t0, -1.), 
                                      point(0., t1, -1.)]))
-            polygons.append(Polygon([point(0., t1, 0.), point(0., t0, 0.),
-                                     point(1., t0, 0.), point(1., t1, 0.)]))
-            polygons.append(Polygon([end, point(1., t1, 1.), 
+            polygons.append(Polygon([point(0., t1, 0.), 
+                                     point(0., t0, 0.),
+                                     point(1., t0, 0.), 
+                                     point(1., t1, 0.)]))
+            polygons.append(Polygon([end.clone(), 
+                                     point(1., t1, 1.), 
                                      point(1., t0, 1.)]))
         
+        return CSG.fromPolygons(polygons)
+
+    @classmethod
+    def cone(cls, **kwargs):
+        """ Returns a cone.
+            
+            Kwargs:
+                start (list): Start of cone, default [0, -1, 0].
+                
+                end (list): End of cone, default [0, 1, 0].
+                
+                radius (float): Maximum radius of cone at start, default 1.0.
+                
+                slices (int): Number of slices, default 16.
+        """
+        s = kwargs.get('start', Vector(0.0, -1.0, 0.0))
+        e = kwargs.get('end', Vector(0.0, 1.0, 0.0))
+        if isinstance(s, list):
+            s = Vector(*s)
+        if isinstance(e, list):
+            e = Vector(*e)
+        r = kwargs.get('radius', 1.0)
+        slices = kwargs.get('slices', 16)
+        ray = e.minus(s)
+        
+        axisZ = ray.unit()
+        isY = (math.fabs(axisZ.y) > 0.5)
+        axisX = Vector(float(isY), float(not isY), 0).cross(axisZ).unit()
+        axisY = axisX.cross(axisZ).unit()
+        startNormal = axisZ.negated()
+        start = Vertex(s, startNormal)
+        polygons = []
+        
+        taperAngle = math.atan2(r, ray.length())
+        sinTaperAngle = math.sin(taperAngle)
+        cosTaperAngle = math.cos(taperAngle)
+        def point(angle):
+            # radial direction pointing out
+            out = axisX.times(math.cos(angle)).plus(
+                axisY.times(math.sin(angle)))
+            pos = s.plus(out.times(r))
+            # normal taking into account the tapering of the cone
+            normal = out.times(cosTaperAngle).plus(axisZ.times(sinTaperAngle))
+            return pos, normal
+
+        dt = math.pi * 2.0 / float(slices)
+        for i in range(0, slices):
+            t0 = i * dt
+            t1 = (i + 1) * dt
+            # coordinates and associated normal pointing outwards of the cone's
+            # side
+            p0, n0 = point(t0)
+            p1, n1 = point(t1)
+            # average normal for the tip
+            nAvg = n0.plus(n1).times(0.5)
+            # polygon on the low side (disk sector)
+            polyStart = Polygon([start.clone(), 
+                                 Vertex(p0, startNormal), 
+                                 Vertex(p1, startNormal)])
+            polygons.append(polyStart)
+            # polygon extending from the low side to the tip
+            polySide = Polygon([Vertex(p0, n0), Vertex(e, nAvg), Vertex(p1, n1)])
+            polygons.append(polySide)
+
         return CSG.fromPolygons(polygons)
