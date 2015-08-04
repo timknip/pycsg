@@ -334,11 +334,12 @@ class CSG(object):
             for j in range(0, stacks):
                 vertices = []
                 appendVertex(vertices, i * dTheta, j * dPhi)
+                i1, j1 = (i + 1) % slices, j + 1
                 if j > 0:
-                    appendVertex(vertices, (i + 1) * dTheta, j * dPhi)
+                    appendVertex(vertices, i1 * dTheta, j * dPhi)
                 if j < stacks - 1:
-                    appendVertex(vertices, (i + 1) * dTheta, (j + 1) * dPhi)
-                appendVertex(vertices, i * dTheta, (j + 1) * dPhi)
+                    appendVertex(vertices, i1 * dTheta, j1 * dPhi)
+                appendVertex(vertices, i * dTheta, j1 * dPhi)
                 polygons.append(Polygon(vertices))
                 
         return CSG.fromPolygons(polygons)
