@@ -62,7 +62,7 @@ class Vector(object):
         return self.x*a.x + self.y*a.y + self.z*a.z
     
     def lerp(self, a, t):
-        """ Lerp. """
+        """ Lerp. Linear interpolation from self to a"""
         return self.plus(a.minus(self).times(t));
     
     def length(self):
@@ -220,7 +220,9 @@ class Plane(object):
                     else:
                         b.append(vi)
                 if (ti | tj) == SPANNING:
+                    # interpolation weight at the intersection point
                     t = (self.w - self.normal.dot(vi.pos)) / self.normal.dot(vj.pos.minus(vi.pos))
+                    # intersection point on the plane
                     v = vi.interpolate(vj, t)
                     f.append(v)
                     b.append(v.clone())
