@@ -32,6 +32,9 @@ class Vector(object):
             self.x = 0.0
             self.y = 0.0
             self.z = 0.0
+
+    def __repr__(self):
+        return '({0}, {1}, {2})'.format(self.x, self.y, self.z)
             
     def clone(self):
         """ Clone. """
@@ -131,6 +134,9 @@ class Vertex(object):
         """
         return Vertex(self.pos.lerp(other.pos, t), 
                           self.normal.lerp(other.normal, t))
+
+    def __repr__(self):
+        return repr(self.pos)
                           
 class Plane(object):
     """
@@ -258,6 +264,9 @@ class Polygon(object):
         map(lambda v: v.flip(), self.vertices)
         self.plane.flip()
 
+    def __repr__(self):
+        return reduce(lambda x,y: x+y, ['['] + [repr(v) + ', ' for v in self.vertices] + [']'], '')
+
 class Node(object):
     """
     class Node
@@ -321,8 +330,10 @@ class Node(object):
         `bsp`.
         """
         self.polygons = bsp.clipPolygons(self.polygons)
-        if self.front: self.front.clipTo(bsp)
-        if self.back: self.back.clipTo(bsp)
+        if self.front: 
+            self.front.clipTo(bsp)
+        if self.back: 
+            self.back.clipTo(bsp)
         
     def allPolygons(self):
         """
