@@ -32,6 +32,9 @@ class Vector(object):
             self.x = 0.0
             self.y = 0.0
             self.z = 0.0
+
+    def __repr__(self):
+        return '({0}, {1}, {2})'.format(self.x, self.y, self.z)
             
     def clone(self):
         """ Clone. """
@@ -62,7 +65,7 @@ class Vector(object):
         return self.x*a.x + self.y*a.y + self.z*a.z
     
     def lerp(self, a, t):
-        """ Lerp. """
+        """ Lerp. Linear interpolation from self to a"""
         return self.plus(a.minus(self).times(t));
     
     def length(self):
@@ -131,6 +134,9 @@ class Vertex(object):
         """
         return Vertex(self.pos.lerp(other.pos, t), 
                           self.normal.lerp(other.normal, t))
+
+    def __repr__(self):
+        return repr(self.pos)
                           
 class Plane(object):
     """
@@ -147,6 +153,7 @@ class Plane(object):
 
     def __init__(self, normal, w):
         self.normal = normal
+        # w is the distance of the plane from (0, 0, 0)
         self.w = w
     
     @classmethod
@@ -169,27 +176,28 @@ class Plane(object):
         respect to this plane. Polygons in front or in back of this plane go into
         either `front` or `back`
         """
-        COPLANAR = 0
-        FRONT = 1
-        BACK = 2
-        SPANNING = 3
+        COPLANAR = 0 # all the vertices are within EPSILON distance from plane
+        FRONT = 1 # all the vertices are in fromnt of the plane
+        BACK = 2 # all the vertices are at the back of the plane
+        SPANNING = 3 # some vertices are in front, some in the back
 
         # Classify each point as well as the entire polygon into one of the above
         # four classes.
         polygonType = 0
-        types = []
+        vertexLocs = []
         
-        for i in range(0, len(polygon.vertices)):
-            t = self.normal.dot(polygon.vertices[i].pos) - self.w;
-            type = -1
+        numVertices = len(polygon.vertices)
+        for i in range(numVertices):
+            t = self.normal.dot(polygon.vertices[i].pos) - self.w
+            loc = -1
             if t < -Plane.EPSILON: 
-                type = BACK
+                loc = BACK
             elif t > Plane.EPSILON: 
-                type = FRONT
+                loc = FRONT
             else: 
-                type = COPLANAR
-            polygonType |= type
-            types.append(type)
+                loc = COPLANAR
+            polygonType |= loc
+            vertexLocs.append(loc)
             
         # Put the polygon in the correct list, splitting it when necessary.
         if polygonType == COPLANAR:
@@ -204,25 +212,30 @@ class Plane(object):
         elif polygonType == SPANNING:
             f = []
             b = []
-            for i in range(0, len(polygon.vertices)):
-                j = (i+1) % len(polygon.vertices)
-                ti = types[i]
-                tj = types[j]
+            for i in range(numVertices):
+                j = (i+1) % numVertices
+                ti = vertexLocs[i]
+                tj = vertexLocs[j]
                 vi = polygon.vertices[i]
                 vj = polygon.vertices[j]
-                if ti != BACK: f.append(vi)
+                if ti != BACK: 
+                    f.append(vi)
                 if ti != FRONT:
                     if ti != BACK: 
                         b.append(vi.clone())
                     else:
                         b.append(vi)
                 if (ti | tj) == SPANNING:
+                    # interpolation weight at the intersection point
                     t = (self.w - self.normal.dot(vi.pos)) / self.normal.dot(vj.pos.minus(vi.pos))
+                    # intersection point on the plane
                     v = vi.interpolate(vj, t)
                     f.append(v)
                     b.append(v.clone())
-            if len(f) >= 3: front.append(Polygon(f, polygon.shared))
-            if len(b) >= 3: back.append(Polygon(b, polygon.shared))
+            if len(f) >= 3: 
+                front.append(Polygon(f, polygon.shared))
+            if len(b) >= 3: 
+                back.append(Polygon(b, polygon.shared))
 
 class Polygon(object):
     """
@@ -251,9 +264,12 @@ class Polygon(object):
         map(lambda v: v.flip(), self.vertices)
         self.plane.flip()
 
-class Node(object):
+    def __repr__(self):
+        return reduce(lambda x,y: x+y, ['['] + [repr(v) + ', ' for v in self.vertices] + [']'], '')
+
+class BSPNode(object):
     """
-    class Node
+    class BSPNode
 
     Holds a node in a BSP tree. A BSP tree is built from a collection of polygons
     by picking a polygon to split along. That polygon (and all other coplanar
@@ -262,18 +278,21 @@ class Node(object):
     no distinction between internal and leaf nodes.
     """
     def __init__(self, polygons=None):
-        self.plane = None
-        self.front = None
-        self.back = None
+        self.plane = None # Plane object
+        self.front = None # BSPNode
+        self.back = None  # BSPNode
         self.polygons = []
         if polygons:
             self.build(polygons)
             
     def clone(self):
-        node = Node()
-        if self.plane: node.plane = self.plane.clone()
-        if self.front: node.front = self.front.clone()
-        if self.back: node.back = self.back.clone()
+        node = BSPNode()
+        if self.plane: 
+            node.plane = self.plane.clone()
+        if self.front: 
+            node.front = self.front.clone()
+        if self.back: 
+            node.back = self.back.clone()
         node.polygons = map(lambda p: p.clone(), self.polygons)
         return node;
         
@@ -284,8 +303,10 @@ class Node(object):
         for poly in self.polygons:
             poly.flip()
         self.plane.flip()
-        if self.front: self.front.invert()
-        if self.back: self.back.invert()
+        if self.front: 
+            self.front.invert()
+        if self.back: 
+            self.back.invert()
         temp = self.front
         self.front = self.back
         self.back = temp
@@ -295,16 +316,22 @@ class Node(object):
         Recursively remove all polygons in `polygons` that are inside this BSP
         tree.
         """
-        if not self.plane: return polygons[:]
+        if not self.plane: 
+            return polygons[:]
+
         front = []
         back = []
         for poly in polygons:
             self.plane.splitPolygon(poly, front, back, front, back)
-        if self.front: front = self.front.clipPolygons(front)
+
+        if self.front: 
+            front = self.front.clipPolygons(front)
+
         if self.back: 
             back = self.back.clipPolygons(back)
         else:
             back = []
+
         front.extend(back)
         return front
         
@@ -314,30 +341,35 @@ class Node(object):
         `bsp`.
         """
         self.polygons = bsp.clipPolygons(self.polygons)
-        if self.front: self.front.clipTo(bsp)
-        if self.back: self.back.clipTo(bsp)
+        if self.front: 
+            self.front.clipTo(bsp)
+        if self.back: 
+            self.back.clipTo(bsp)
         
     def allPolygons(self):
         """
         Return a list of all polygons in this BSP tree.
         """
         polygons = self.polygons[:]
-        if self.front: polygons.extend(self.front.allPolygons())
-        if self.back: polygons.extend(self.back.allPolygons())
+        if self.front: 
+            polygons.extend(self.front.allPolygons())
+        if self.back: 
+            polygons.extend(self.back.allPolygons())
         return polygons
         
     def build(self, polygons):
         if not len(polygons):
             return
-        if not self.plane: self.plane = polygons[0].plane.clone()
+        if not self.plane: 
+            self.plane = polygons[0].plane.clone()
         front = []
         back = []
         for poly in polygons:
             self.plane.splitPolygon(poly, self.polygons, self.polygons, front, back)
         if len(front):
-            if not self.front: self.front = Node()
+            if not self.front: self.front = BSPNode()
             self.front.build(front)
         if len(back):
-            if not self.back: self.back = Node()
+            if not self.back: self.back = BSPNode()
             self.back.build(back)
 
