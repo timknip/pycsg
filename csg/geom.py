@@ -147,6 +147,7 @@ class Plane(object):
 
     def __init__(self, normal, w):
         self.normal = normal
+        # w is the distance of the plane from (0, 0, 0)
         self.w = w
     
     @classmethod
@@ -169,27 +170,28 @@ class Plane(object):
         respect to this plane. Polygons in front or in back of this plane go into
         either `front` or `back`
         """
-        COPLANAR = 0
-        FRONT = 1
-        BACK = 2
-        SPANNING = 3
+        COPLANAR = 0 # all the vertices are within EPSILON distance from plane
+        FRONT = 1 # all the vertices are in fromnt of the plane
+        BACK = 2 # all the vertices are at the back of the plane
+        SPANNING = 3 # some vertices are in front, some in the back
 
         # Classify each point as well as the entire polygon into one of the above
         # four classes.
         polygonType = 0
-        types = []
+        vertexLocs = []
         
-        for i in range(0, len(polygon.vertices)):
-            t = self.normal.dot(polygon.vertices[i].pos) - self.w;
-            type = -1
+        numVertices = len(polygon.vertices)
+        for i in range(numVertices):
+            t = self.normal.dot(polygon.vertices[i].pos) - self.w
+            loc = -1
             if t < -Plane.EPSILON: 
-                type = BACK
+                loc = BACK
             elif t > Plane.EPSILON: 
-                type = FRONT
+                loc = FRONT
             else: 
-                type = COPLANAR
-            polygonType |= type
-            types.append(type)
+                loc = COPLANAR
+            polygonType |= loc
+            vertexLocs.append(loc)
             
         # Put the polygon in the correct list, splitting it when necessary.
         if polygonType == COPLANAR:
@@ -204,13 +206,14 @@ class Plane(object):
         elif polygonType == SPANNING:
             f = []
             b = []
-            for i in range(0, len(polygon.vertices)):
-                j = (i+1) % len(polygon.vertices)
-                ti = types[i]
-                tj = types[j]
+            for i in range(numVertices):
+                j = (i+1) % numVertices
+                ti = vertexLocs[i]
+                tj = vertexLocs[j]
                 vi = polygon.vertices[i]
                 vj = polygon.vertices[j]
-                if ti != BACK: f.append(vi)
+                if ti != BACK: 
+                    f.append(vi)
                 if ti != FRONT:
                     if ti != BACK: 
                         b.append(vi.clone())
@@ -221,8 +224,10 @@ class Plane(object):
                     v = vi.interpolate(vj, t)
                     f.append(v)
                     b.append(v.clone())
-            if len(f) >= 3: front.append(Polygon(f, polygon.shared))
-            if len(b) >= 3: back.append(Polygon(b, polygon.shared))
+            if len(f) >= 3: 
+                front.append(Polygon(f, polygon.shared))
+            if len(b) >= 3: 
+                back.append(Polygon(b, polygon.shared))
 
 class Polygon(object):
     """
