@@ -267,9 +267,9 @@ class Polygon(object):
     def __repr__(self):
         return reduce(lambda x,y: x+y, ['['] + [repr(v) + ', ' for v in self.vertices] + [']'], '')
 
-class Node(object):
+class BSPNode(object):
     """
-    class Node
+    class BSPNode
 
     Holds a node in a BSP tree. A BSP tree is built from a collection of polygons
     by picking a polygon to split along. That polygon (and all other coplanar
@@ -278,18 +278,21 @@ class Node(object):
     no distinction between internal and leaf nodes.
     """
     def __init__(self, polygons=None):
-        self.plane = None
-        self.front = None
-        self.back = None
+        self.plane = None # Plane object
+        self.front = None # BSPNode
+        self.back = None  # BSPNode
         self.polygons = []
         if polygons:
             self.build(polygons)
             
     def clone(self):
-        node = Node()
-        if self.plane: node.plane = self.plane.clone()
-        if self.front: node.front = self.front.clone()
-        if self.back: node.back = self.back.clone()
+        node = BSPNode()
+        if self.plane: 
+            node.plane = self.plane.clone()
+        if self.front: 
+            node.front = self.front.clone()
+        if self.back: 
+            node.back = self.back.clone()
         node.polygons = map(lambda p: p.clone(), self.polygons)
         return node;
         
@@ -300,8 +303,10 @@ class Node(object):
         for poly in self.polygons:
             poly.flip()
         self.plane.flip()
-        if self.front: self.front.invert()
-        if self.back: self.back.invert()
+        if self.front: 
+            self.front.invert()
+        if self.back: 
+            self.back.invert()
         temp = self.front
         self.front = self.back
         self.back = temp
@@ -311,16 +316,22 @@ class Node(object):
         Recursively remove all polygons in `polygons` that are inside this BSP
         tree.
         """
-        if not self.plane: return polygons[:]
+        if not self.plane: 
+            return polygons[:]
+
         front = []
         back = []
         for poly in polygons:
             self.plane.splitPolygon(poly, front, back, front, back)
-        if self.front: front = self.front.clipPolygons(front)
+
+        if self.front: 
+            front = self.front.clipPolygons(front)
+
         if self.back: 
             back = self.back.clipPolygons(back)
         else:
             back = []
+
         front.extend(back)
         return front
         
@@ -340,22 +351,25 @@ class Node(object):
         Return a list of all polygons in this BSP tree.
         """
         polygons = self.polygons[:]
-        if self.front: polygons.extend(self.front.allPolygons())
-        if self.back: polygons.extend(self.back.allPolygons())
+        if self.front: 
+            polygons.extend(self.front.allPolygons())
+        if self.back: 
+            polygons.extend(self.back.allPolygons())
         return polygons
         
     def build(self, polygons):
         if not len(polygons):
             return
-        if not self.plane: self.plane = polygons[0].plane.clone()
+        if not self.plane: 
+            self.plane = polygons[0].plane.clone()
         front = []
         back = []
         for poly in polygons:
             self.plane.splitPolygon(poly, self.polygons, self.polygons, front, back)
         if len(front):
-            if not self.front: self.front = Node()
+            if not self.front: self.front = BSPNode()
             self.front.build(front)
         if len(back):
-            if not self.back: self.back = Node()
+            if not self.back: self.back = BSPNode()
             self.back.build(back)
 

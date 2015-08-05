@@ -174,8 +174,8 @@ class CSG(object):
                  |       |            |       |
                  +-------+            +-------+
         """
-        a = Node(self.clone().polygons)
-        b = Node(csg.clone().polygons)
+        a = BSPNode(self.clone().polygons)
+        b = BSPNode(csg.clone().polygons)
         a.clipTo(b)
         b.clipTo(a)
         b.invert()
@@ -203,8 +203,8 @@ class CSG(object):
                  |       |
                  +-------+
         """
-        a = Node(self.clone().polygons)
-        b = Node(csg.clone().polygons)
+        a = BSPNode(self.clone().polygons)
+        b = BSPNode(csg.clone().polygons)
         a.invert()
         a.clipTo(b)
         b.clipTo(a)
@@ -234,8 +234,8 @@ class CSG(object):
                  |       |
                  +-------+
         """
-        a = Node(self.clone().polygons)
-        b = Node(csg.clone().polygons)
+        a = BSPNode(self.clone().polygons)
+        b = BSPNode(csg.clone().polygons)
         a.invert()
         b.clipTo(a)
         b.invert()
