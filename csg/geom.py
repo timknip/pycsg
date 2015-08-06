@@ -1,4 +1,8 @@
 import math
+import sys
+
+# increase the max number of recursive calls
+sys.setrecursionlimit(10000) # my default is 1000, increasing too much may cause a seg fault
 
 class Vector(object):
     """
@@ -167,6 +171,9 @@ class Plane(object):
     def flip(self):
         self.normal = self.normal.negated()
         self.w = -self.w
+
+    def __repr__(self):
+        return 'normal: {0} w: {1}'.format(self.normal, self.w)
     
     def splitPolygon(self, polygon, coplanarFront, coplanarBack, front, back):
         """
@@ -278,7 +285,7 @@ class BSPNode(object):
     no distinction between internal and leaf nodes.
     """
     def __init__(self, polygons=None):
-        self.plane = None # Plane object
+        self.plane = None # Plane instance
         self.front = None # BSPNode
         self.back = None  # BSPNode
         self.polygons = []
@@ -294,7 +301,7 @@ class BSPNode(object):
         if self.back: 
             node.back = self.back.clone()
         node.polygons = map(lambda p: p.clone(), self.polygons)
-        return node;
+        return node
         
     def invert(self):
         """ 
