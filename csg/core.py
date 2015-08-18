@@ -88,17 +88,23 @@ class CSG(object):
            axis: axis of rotation (array of floats)
            angleDeg: rotation angle in degrees
         """
-        a = Vector(axis[0], axis[1], axis[2]).unit()
+        ax = Vector(axis[0], axis[1], axis[2]).unit()
         cosAngle = math.cos(math.pi * angleDeg / 180.)
         sinAngle = math.sin(math.pi * angleDeg / 180.)
 
         def newVector(v):
-            vA = v.dot(a)
-            vPerp = v.minus(a.times(vA))
-            u1 = v.minus(a.times(vA)).unit()
-            u2 = u1.cross(a)
+            vA = v.dot(ax)
+            vPerp = v.minus(ax.times(vA))
+            u1 = v.minus(ax.times(vA)).unit()
+            u2 = u1.cross(ax)
             vPerpLen = vPerp.length()
-            return a.times(vA).plus(u1.times(vPerpLen*cosAngle).plus(u2.times(vPerpLen*sinAngle)))
+            if vPerpLen > 0:
+                vCosA = vPerpLen*cosAngle
+                vSinA = vPerpLen*sinAngle
+                return ax.times(vA).plus(u1.times(vCosA).plus(u2.times(vSinA)))
+            else:
+                # zero distance to axis, no need to rotate
+                return v
 
         for poly in self.polygons:
             for vert in poly.vertices:
