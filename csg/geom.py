@@ -47,22 +47,37 @@ class Vector(object):
     def negated(self):
         """ Negated. """
         return Vector(-self.x, -self.y, -self.z)
+
+    def __neg__(self):
+        return self.negated()
     
     def plus(self, a):
         """ Add. """
         return Vector(self.x+a.x, self.y+a.y, self.z+a.z)
+
+    def __add__(self, a):
+        return self.plus(a)
     
     def minus(self, a):
         """ Subtract. """
         return Vector(self.x-a.x, self.y-a.y, self.z-a.z)
+
+    def __sub__(self, a):
+        return self.minus(a)
     
     def times(self, a):
         """ Multiply. """
         return Vector(self.x*a, self.y*a, self.z*a)
+
+    def __mul__(self, a):
+        return self.times(a)
             
     def dividedBy(self, a):
         """ Divide. """
         return Vector(self.x/a, self.y/a, self.z/a)
+
+    def __div__(self, a):
+        return self.dividedBy(a)
     
     def dot(self, a):
         """ Dot. """
