@@ -39,7 +39,9 @@ class TestCSG(unittest.TestCase):
 
     def test_sphere(self):
         a = CSG.sphere(center=[0., 0., 0.], radius=1., slices=4, stacks=3)
-        a.saveVTK('test_sphere.vtk')
+       	a.saveVTK('test_sphere.vtk')
+        b = a.refine()
+        b.saveVTK('test_sphere_refined.vtk')
         
     def test_cube_intersect(self):
         a = CSG.cube()
