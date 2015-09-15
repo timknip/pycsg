@@ -53,10 +53,11 @@ class TestCSG(unittest.TestCase):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
         c = a + b
-        c.saveVTK('test_cube_union.vtk')
+	c.saveVTK('test_cube_union.vtk')
+	d = c.refine().refine()
+        d.saveVTK('test_cube_union_refined_2x.vtk')
 
     def test_sphere_union(self):
-        # this test currently fails
         a = CSG.sphere(center=(0., 0., 0.), radius=1.0, slices=64, stacks=32)
         b = CSG.sphere(center=(1.99, 0., 0.), radius=1.0, slices=64, stacks=32)
         c = a + b
@@ -92,6 +93,8 @@ class TestCSG(unittest.TestCase):
         notch2 = CSG.cube(center=[-0.10, 0., 0.], radius=[0.02, 0.02, 0.20])
         bolt = shaft + head - notch1 - notch2
         bolt.saveVTK('test_bolt.vtk')
+	bolt2x = bolt.refine()
+	bolt2x.saveVTK('test_bolt2x.vtk')
 
     def test_translate_cube(self):
         a = CSG.cube()
