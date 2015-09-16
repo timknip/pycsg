@@ -2,7 +2,7 @@ import math
 import sys
 
 # increase the max number of recursive calls
-sys.setrecursionlimit(100000) # my default is 1000, increasing too much may cause a seg fault
+sys.setrecursionlimit(50000) # my default is 1000, increasing too much may cause a seg fault
 
 class Vector(object):
     """
