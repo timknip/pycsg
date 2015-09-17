@@ -25,6 +25,12 @@ class TestBSPNode(unittest.TestCase):
         node = BSPNode(polygons)
 
     def test_infiniteRecursion(self):
+        # This polygon is not exactly planar, causing
+        # an infinite recursion when building the BSP
+        # tree. Because of the last node, polygon is
+        # put at the back of the list with respect to
+        # its own cutting plane -- it should be classified
+        # as co-planar
         v0 = Vertex([0.12, -0.24, 1.50])
         v1 = Vertex([0.01, 0.00, 1.75])
         v2 = Vertex([-0.03, 0.05, 1.79])
