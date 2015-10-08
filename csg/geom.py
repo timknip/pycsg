@@ -16,26 +16,21 @@ class Vector(object):
          Vector({ 'x': 1, 'y': 2, 'z': 3 });
     """
     def __init__(self, *args):
+        self.x, self.y, self.z = 0., 0., 0.
         if len(args) == 3:
             self.x = args[0]
             self.y = args[1]
             self.z = args[2]
-        elif len(args) == 1 and isinstance(args[0], Vector):
-            self.x = args[0][0]
-            self.y = args[0][1]
-            self.z = args[0][2]
-        elif len(args) == 1 and isinstance(args[0], list):
-            self.x = args[0][0]
-            self.y = args[0][1]
-            self.z = args[0][2]
-        elif len(args) == 1 and args[0] and 'x' in args[0]:
-            self.x = args[0]['x']
-            self.y = args[0]['y']
-            self.z = args[0]['z']
-        else:
-            self.x = 0.0
-            self.y = 0.0
-            self.z = 0.0
+        elif len(args) == 1:
+            a = args[0]
+            if isinstance(a, dict):
+                self.x = a.get('x', 0.0)
+                self.y = a.get('y', 0.0)
+                self.z = a.get('z', 0.0)
+            elif a is not None and len(a) == 3:
+                self.x = a[0]
+                self.y = a[1]
+                self.z = a[2]
 
     def __repr__(self):
         return '({0}, {1}, {2})'.format(self.x, self.y, self.z)
