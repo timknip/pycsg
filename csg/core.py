@@ -156,6 +156,7 @@ class CSG(object):
         number of vertex indices in the polygon connectivity list
         (count).
         """
+        offset = 1.234567890
         verts = []
         polys = []
         vertexIndexMap = {}
@@ -165,7 +166,14 @@ class CSG(object):
             cell = []
             for v in poly.vertices:
                 p = v.pos
-                vKey = (p[0], p[1], p[2])
+                # use string key to remove degeneracy associated
+                # very close points. The format %.10e ensures that
+                # points differing in the 11 digits and higher are 
+                # treated as the same. The offset ensures that 1.2e-10
+                # and 1.3e-10 are also treated to be the same.
+                vKey = '%.10e,%.10e,%.10e' % (p[0] + offset, 
+                                              p[1] + offset, 
+                                              p[2] + offset)
                 if not vertexIndexMap.has_key(vKey):
                     vertexIndexMap[vKey] = len(vertexIndexMap)
                 index = vertexIndexMap[vKey]
@@ -175,7 +183,12 @@ class CSG(object):
         # sort by index
         sortedVertexIndex = sorted(vertexIndexMap.items(),
                                    key=operator.itemgetter(1))
-        verts = [v[0] for v in sortedVertexIndex]
+        verts = []
+        for v, i in sortedVertexIndex:
+            p = []
+            for c in v.split(','):
+                p.append(float(c) - offset)
+            verts.append(tuple(p))
         return verts, polys, count
 
     def saveVTK(self, filename):
