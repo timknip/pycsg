@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name='pycsg',
-    version='0.2.1',
+    version='0.2.2',
     description='Constructive Solid Geometry (CSG)',
     long_description=read('README.md'),
     keywords = "constructive solid geometry csg utilities",
