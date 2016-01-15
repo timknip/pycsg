@@ -379,9 +379,9 @@ class CSG(object):
         polygons = []
         def appendVertex(vertices, theta, phi):
             d = Vector(
-                center[0] + r * math.cos(theta) * math.sin(phi),
-                center[1] + r * math.cos(phi),
-                center[2] + r * math.sin(theta) * math.sin(phi))
+                math.cos(theta) * math.sin(phi),
+                math.cos(phi),
+                math.sin(theta) * math.sin(phi))
             vertices.append(Vertex(c.plus(d.times(r)), d))
             
         dTheta = math.pi * 2.0 / float(slices)
