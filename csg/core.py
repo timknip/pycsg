@@ -386,17 +386,66 @@ class CSG(object):
             
         dTheta = math.pi * 2.0 / float(slices)
         dPhi = math.pi / float(stacks)
-        for i in range(0, slices):
-            for j in range(0, stacks):
-                vertices = []
-                appendVertex(vertices, i * dTheta, j * dPhi)
-                i1, j1 = (i + 1) % slices, j + 1
-                if j > 0:
-                    appendVertex(vertices, i1 * dTheta, j * dPhi)
-                if j < stacks - 1:
-                    appendVertex(vertices, i1 * dTheta, j1 * dPhi)
-                appendVertex(vertices, i * dTheta, j1 * dPhi)
-                polygons.append(Polygon(vertices))
+
+        j0 = 0
+        j1 = j0 + 1
+        for i0 in range(0, slices):
+            i1 = i0 + 1
+            #  +--+
+            #  | /
+            #  |/
+            #  +
+            vertices = []
+            appendVertex(vertices, i0 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i1 * dTheta, j1 * dPhi)
+            appendVertex(vertices, i0 * dTheta, j1 * dPhi)
+            polygons.append(Polygon(vertices))
+
+        j0 = stacks - 1
+        j1 = j0 + 1
+        for i0 in range(0, slices):
+            i1 = i0 + 1
+            #  +
+            #  |\
+            #  | \
+            #  +--+
+            vertices = []
+            appendVertex(vertices, i0 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i1 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i0 * dTheta, j1 * dPhi)
+	    polygons.append(Polygon(vertices))
+            
+        for j0 in range(1, stacks - 1):
+            j1 = j0 + 0.5
+            j2 = j0 + 1
+            for i0 in range(0, slices):
+                i1 = i0 + 0.5
+                i2 = i0 + 1
+                #  +---+
+                #  |\ /|
+                #  | x |
+                #  |/ \|
+                #  +---+
+                verticesN = []
+                appendVertex(verticesN, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesN, i2 * dTheta, j2 * dPhi)
+                appendVertex(verticesN, i0 * dTheta, j2 * dPhi)
+                polygons.append(Polygon(verticesN))
+                verticesS = []
+                appendVertex(verticesS, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesS, i0 * dTheta, j0 * dPhi)
+                appendVertex(verticesS, i2 * dTheta, j0 * dPhi)
+                polygons.append(Polygon(verticesS))
+                verticesW = []
+                appendVertex(verticesW, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesW, i0 * dTheta, j2 * dPhi)
+                appendVertex(verticesW, i0 * dTheta, j0 * dPhi)
+                polygons.append(Polygon(verticesW))
+                verticesE = []
+                appendVertex(verticesE, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesE, i2 * dTheta, j0 * dPhi)
+                appendVertex(verticesE, i2 * dTheta, j2 * dPhi)
+                polygons.append(Polygon(verticesE))
                 
         return CSG.fromPolygons(polygons)
     
