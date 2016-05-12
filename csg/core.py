@@ -413,7 +413,7 @@ class CSG(object):
             appendVertex(vertices, i0 * dTheta, j0 * dPhi)
             appendVertex(vertices, i1 * dTheta, j0 * dPhi)
             appendVertex(vertices, i0 * dTheta, j1 * dPhi)
-	    polygons.append(Polygon(vertices))
+            polygons.append(Polygon(vertices))
             
         for j0 in range(1, stacks - 1):
             j1 = j0 + 0.5

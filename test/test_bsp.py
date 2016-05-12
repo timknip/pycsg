@@ -8,10 +8,10 @@ from csg.geom import BSPNode, Polygon, Vector, Vertex
 
 class TestBSPNode(unittest.TestCase):
     def setUp(self):
-        print 'setup'
+        print('setup')
     
     def tearDown(self):
-        print 'tear'
+        print('tear')
     
     def test_noPolygons(self):
         node = BSPNode()

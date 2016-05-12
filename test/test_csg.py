@@ -9,13 +9,13 @@ from csg.geom import Vector
 
 class TestCSG(unittest.TestCase):
     def setUp(self):
-        print 'setup'
+        print('setup')
     
     def tearDown(self):
-        print 'tear'
+        print('tear')
     
     def test_cs(self):
-        print 'ss'
+        print('ss')
 
     def test_toPolygons(self):
         a = CSG.cube([0.5, 0.5, 0.0])
@@ -53,8 +53,8 @@ class TestCSG(unittest.TestCase):
         a = CSG.cube()
         b = CSG.cube([0.5, 0.5, 0.0])
         c = a + b
-	c.saveVTK('test_cube_union.vtk')
-	d = c.refine().refine()
+        c.saveVTK('test_cube_union.vtk')
+        d = c.refine().refine()
         d.saveVTK('test_cube_union_refined_2x.vtk')
 
     def test_sphere_union(self):
@@ -93,8 +93,8 @@ class TestCSG(unittest.TestCase):
         notch2 = CSG.cube(center=[-0.10, 0., 0.], radius=[0.02, 0.02, 0.20])
         bolt = shaft + head - notch1 - notch2
         bolt.saveVTK('test_bolt.vtk')
-	bolt2x = bolt.refine()
-	bolt2x.saveVTK('test_bolt2x.vtk')
+        bolt2x = bolt.refine()
+        bolt2x.saveVTK('test_bolt2x.vtk')
 
     def test_translate_cube(self):
         a = CSG.cube()
