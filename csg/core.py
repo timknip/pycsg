@@ -1,6 +1,6 @@
 import math
 import operator
-from geom import *
+from csg.geom import *
 
 class CSG(object):
     """
@@ -65,7 +65,7 @@ class CSG(object):
     
     def clone(self):
         csg = CSG()
-        csg.polygons = map(lambda p: p.clone(), self.polygons)
+        csg.polygons = list(map(lambda p: p.clone(), self.polygons))
         return csg
         
     def toPolygons(self):
@@ -169,12 +169,12 @@ class CSG(object):
                 # use string key to remove degeneracy associated
                 # very close points. The format %.10e ensures that
                 # points differing in the 11 digits and higher are 
-                # treated as the same. The offset ensures that 1.2e-10
-                # and 1.3e-10 are also treated to be the same.
+                # treated as the same. For instance 1.2e-10 and 
+                # 1.3e-10 are essentially the same.
                 vKey = '%.10e,%.10e,%.10e' % (p[0] + offset, 
                                               p[1] + offset, 
                                               p[2] + offset)
-                if not vertexIndexMap.has_key(vKey):
+                if not vKey in vertexIndexMap:
                     vertexIndexMap[vKey] = len(vertexIndexMap)
                 index = vertexIndexMap[vKey]
                 cell.append(index)
@@ -195,24 +195,24 @@ class CSG(object):
         """
         Save polygons in VTK file.
         """
-        f = file(filename, 'w')
-        print >> f, '# vtk DataFile Version 3.0'
-        print >> f, 'pycsg output'
-        print >> f, 'ASCII'
-        print >> f, 'DATASET POLYDATA'
+        f = open(filename, 'w')
+        f.write('# vtk DataFile Version 3.0\n')
+        f.write('pycsg output\n')
+        f.write('ASCII\n')
+        f.write('DATASET POLYDATA\n')
         
         verts, cells, count = self.toVerticesAndPolygons()
 
-        print >> f, 'POINTS {} float'.format(len(verts))
+        f.write('POINTS {0} float\n'.format(len(verts)))
         for v in verts:
-            print >> f, '{} {} {}'.format(v[0], v[1], v[2])
+            f.write('{0} {1} {2}\n'.format(v[0], v[1], v[2]))
         numCells = len(cells)
-        print >> f, 'POLYGONS {} {}'.format(numCells, count + numCells)
+        f.write('POLYGONS {0} {1}\n'.format(numCells, count + numCells))
         for cell in cells:
-            print >> f, '{} '.format(len(cell)),
+            f.write('{0} '.format(len(cell)))
             for index in cell:
-                print >> f, '{} '.format(index),
-            print >> f
+                f.write('{1} '.format(index))
+            f.write('\n')
         
     def union(self, csg):
         """
@@ -333,7 +333,7 @@ class CSG(object):
         if isinstance(radius, list): r = radius
         else: r = [radius, radius, radius]
 
-        polygons = map(
+        polygons = list(map(
             lambda v: Polygon( 
                 map(lambda i: 
                     Vertex(
@@ -351,7 +351,7 @@ class CSG(object):
                         [[2, 6, 7, 3], [0, +1, 0]],
                         [[0, 2, 3, 1], [0, 0, -1]],
                         [[4, 5, 7, 6], [0, 0, +1]]
-                    ])
+                    ]))
         return CSG.fromPolygons(polygons)
         
     @classmethod

@@ -274,7 +274,7 @@ class Polygon(object):
         self.plane = Plane.fromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos)
     
     def clone(self):
-        vertices = map(lambda v: v.clone(), self.vertices)
+        vertices = list(map(lambda v: v.clone(), self.vertices))
         return Polygon(vertices, self.shared)
                 
     def flip(self):
