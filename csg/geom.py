@@ -313,7 +313,7 @@ class BSPNode(object):
             node.front = self.front.clone()
         if self.back: 
             node.back = self.back.clone()
-        node.polygons = map(lambda p: p.clone(), self.polygons)
+        node.polygons = list(map(lambda p: p.clone(), self.polygons))
         return node
         
     def invert(self):

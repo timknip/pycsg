@@ -335,7 +335,7 @@ class CSG(object):
 
         polygons = list(map(
             lambda v: Polygon( 
-                map(lambda i: 
+                list(map(lambda i: 
                     Vertex(
                         Vector(
                             c.x + r[0] * (2 * bool(i & 1) - 1),
@@ -343,7 +343,7 @@ class CSG(object):
                             c.z + r[2] * (2 * bool(i & 4) - 1)
                         ), 
                         None
-                    ), v[0])),
+                    ), v[0]))),
                     [
                         [[0, 4, 6, 2], [-1, 0, 0]],
                         [[1, 3, 7, 5], [+1, 0, 0]],
