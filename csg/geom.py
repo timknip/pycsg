@@ -1,5 +1,6 @@
 import math
 import sys
+from functools import reduce
 
 # increase the max number of recursive calls
 sys.setrecursionlimit(10000) # my default is 1000, increasing too much may cause a seg fault

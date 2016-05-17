@@ -1,6 +1,7 @@
 import math
 import operator
 from csg.geom import *
+from functools import reduce
 
 class CSG(object):
     """
