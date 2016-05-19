@@ -73,7 +73,7 @@ class Vector(object):
         return Vector(self.x/a, self.y/a, self.z/a)
 
     def __truediv__(self, a):
-        return self.dividedBy(a)
+        return self.dividedBy(float(a))
 
     def __div__(self, a):
         return self.dividedBy(a)
