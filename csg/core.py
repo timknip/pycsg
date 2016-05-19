@@ -212,7 +212,7 @@ class CSG(object):
             for cell in cells:
                 f.write('{0} '.format(len(cell)))
                 for index in cell:
-                    f.write('{1} '.format(index))
+                    f.write('{0} '.format(index))
                 f.write('\n')
 
     def union(self, csg):
