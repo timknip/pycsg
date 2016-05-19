@@ -72,7 +72,7 @@ class Vector(object):
         """ Divide. """
         return Vector(self.x/a, self.y/a, self.z/a)
 
-    def __div__(self, a):
+    def __truediv__(self, a):
         return self.dividedBy(a)
     
     def dot(self, a):
