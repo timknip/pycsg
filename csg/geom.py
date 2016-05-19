@@ -76,7 +76,7 @@ class Vector(object):
         return self.dividedBy(float(a))
 
     def __div__(self, a):
-        return self.dividedBy(a)
+        return self.dividedBy(float(a))
     
     def dot(self, a):
         """ Dot. """
