@@ -74,6 +74,9 @@ class Vector(object):
 
     def __truediv__(self, a):
         return self.dividedBy(a)
+
+    def __div__(self, a):
+        return self.dividedBy(a)
     
     def dot(self, a):
         """ Dot. """
