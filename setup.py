@@ -1,5 +1,6 @@
 import os
 from setuptools import setup, find_packages
+import csg # to get the package version number
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -10,7 +11,7 @@ def read(fname):
 
 setup(
     name='pycsg',
-    version='0.3.0',
+    version=csg.__version__,
     description='Constructive Solid Geometry (CSG)',
     long_description=read('README.md'),
     keywords = "constructive solid geometry csg utilities",

@@ -1,5 +1,6 @@
 import math
 import sys
+from functools import reduce
 
 # increase the max number of recursive calls
 sys.setrecursionlimit(10000) # my default is 1000, increasing too much may cause a seg fault
@@ -16,26 +17,21 @@ class Vector(object):
          Vector({ 'x': 1, 'y': 2, 'z': 3 });
     """
     def __init__(self, *args):
+        self.x, self.y, self.z = 0., 0., 0.
         if len(args) == 3:
             self.x = args[0]
             self.y = args[1]
             self.z = args[2]
-        elif len(args) == 1 and isinstance(args[0], Vector):
-            self.x = args[0][0]
-            self.y = args[0][1]
-            self.z = args[0][2]
-        elif len(args) == 1 and isinstance(args[0], list):
-            self.x = args[0][0]
-            self.y = args[0][1]
-            self.z = args[0][2]
-        elif len(args) == 1 and args[0] and 'x' in args[0]:
-            self.x = args[0]['x']
-            self.y = args[0]['y']
-            self.z = args[0]['z']
-        else:
-            self.x = 0.0
-            self.y = 0.0
-            self.z = 0.0
+        elif len(args) == 1:
+            a = args[0]
+            if isinstance(a, dict):
+                self.x = a.get('x', 0.0)
+                self.y = a.get('y', 0.0)
+                self.z = a.get('z', 0.0)
+            elif a is not None and len(a) == 3:
+                self.x = a[0]
+                self.y = a[1]
+                self.z = a[2]
 
     def __repr__(self):
         return '({0}, {1}, {2})'.format(self.x, self.y, self.z)
@@ -76,8 +72,11 @@ class Vector(object):
         """ Divide. """
         return Vector(self.x/a, self.y/a, self.z/a)
 
+    def __truediv__(self, a):
+        return self.dividedBy(float(a))
+
     def __div__(self, a):
-        return self.dividedBy(a)
+        return self.dividedBy(float(a))
     
     def dot(self, a):
         """ Dot. """
@@ -168,11 +167,11 @@ class Plane(object):
     `Plane.EPSILON` is the tolerance used by `splitPolygon()` to decide if a
     point is on the plane.
     """
-    EPSILON = 1e-5
+    EPSILON = 1.e-5
 
     def __init__(self, normal, w):
         self.normal = normal
-        # w is the distance of the plane from (0, 0, 0)
+        # w is the (perpendicular) distance of the plane from (0, 0, 0)
         self.w = w
     
     @classmethod
@@ -199,7 +198,7 @@ class Plane(object):
         either `front` or `back`
         """
         COPLANAR = 0 # all the vertices are within EPSILON distance from plane
-        FRONT = 1 # all the vertices are in fromnt of the plane
+        FRONT = 1 # all the vertices are in front of the plane
         BACK = 2 # all the vertices are at the back of the plane
         SPANNING = 3 # some vertices are in front, some in the back
 
@@ -220,10 +219,11 @@ class Plane(object):
                 loc = COPLANAR
             polygonType |= loc
             vertexLocs.append(loc)
-            
+    
         # Put the polygon in the correct list, splitting it when necessary.
         if polygonType == COPLANAR:
-            if self.normal.dot(polygon.plane.normal) > 0:
+            normalDotPlaneNormal = self.normal.dot(polygon.plane.normal)
+            if normalDotPlaneNormal > 0:
                 coplanarFront.append(polygon)
             else:
                 coplanarBack.append(polygon)
@@ -278,7 +278,7 @@ class Polygon(object):
         self.plane = Plane.fromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos)
     
     def clone(self):
-        vertices = map(lambda v: v.clone(), self.vertices)
+        vertices = list(map(lambda v: v.clone(), self.vertices))
         return Polygon(vertices, self.shared)
                 
     def flip(self):
@@ -287,7 +287,9 @@ class Polygon(object):
         self.plane.flip()
 
     def __repr__(self):
-        return reduce(lambda x,y: x+y, ['['] + [repr(v) + ', ' for v in self.vertices] + [']'], '')
+        return reduce(lambda x,y: x+y,
+                      ['Polygon(['] + [repr(v) + ', ' \
+                                       for v in self.vertices] + ['])'], '')
 
 class BSPNode(object):
     """
@@ -315,7 +317,7 @@ class BSPNode(object):
             node.front = self.front.clone()
         if self.back: 
             node.back = self.back.clone()
-        node.polygons = map(lambda p: p.clone(), self.polygons)
+        node.polygons = list(map(lambda p: p.clone(), self.polygons))
         return node
         
     def invert(self):
@@ -380,18 +382,32 @@ class BSPNode(object):
         return polygons
         
     def build(self, polygons):
-        if not len(polygons):
+        """
+        Build a BSP tree out of `polygons`. When called on an existing tree, the
+        new polygons are filtered down to the bottom of the tree and become new
+        nodes there. Each set of polygons is partitioned using the first polygon
+        (no heuristic is used to pick a good split).
+        """
+        if len(polygons) == 0:
             return
         if not self.plane: 
             self.plane = polygons[0].plane.clone()
+        # add polygon to this node
+        self.polygons.append(polygons[0])
         front = []
         back = []
-        for poly in polygons:
-            self.plane.splitPolygon(poly, self.polygons, self.polygons, front, back)
-        if len(front):
-            if not self.front: self.front = BSPNode()
+        # split all other polygons using the first polygon's plane
+        for poly in polygons[1:]:
+            # coplanar front and back polygons go into self.polygons
+            self.plane.splitPolygon(poly, self.polygons, self.polygons,
+                                    front, back)
+        # recursively build the BSP tree
+        if len(front) > 0:
+            if not self.front:
+                self.front = BSPNode()
             self.front.build(front)
-        if len(back):
-            if not self.back: self.back = BSPNode()
+        if len(back) > 0:
+            if not self.back:
+                self.back = BSPNode()
             self.back.build(back)
 

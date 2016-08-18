@@ -1,6 +1,7 @@
 import math
 import operator
-from geom import *
+from csg.geom import *
+from functools import reduce
 
 class CSG(object):
     """
@@ -65,7 +66,7 @@ class CSG(object):
     
     def clone(self):
         csg = CSG()
-        csg.polygons = map(lambda p: p.clone(), self.polygons)
+        csg.polygons = list(map(lambda p: p.clone(), self.polygons))
         return csg
         
     def toPolygons(self):
@@ -156,6 +157,7 @@ class CSG(object):
         number of vertex indices in the polygon connectivity list
         (count).
         """
+        offset = 1.234567890
         verts = []
         polys = []
         vertexIndexMap = {}
@@ -165,8 +167,15 @@ class CSG(object):
             cell = []
             for v in poly.vertices:
                 p = v.pos
-                vKey = (p[0], p[1], p[2])
-                if not vertexIndexMap.has_key(vKey):
+                # use string key to remove degeneracy associated
+                # very close points. The format %.10e ensures that
+                # points differing in the 11 digits and higher are 
+                # treated as the same. For instance 1.2e-10 and 
+                # 1.3e-10 are essentially the same.
+                vKey = '%.10e,%.10e,%.10e' % (p[0] + offset, 
+                                              p[1] + offset, 
+                                              p[2] + offset)
+                if not vKey in vertexIndexMap:
                     vertexIndexMap[vKey] = len(vertexIndexMap)
                 index = vertexIndexMap[vKey]
                 cell.append(index)
@@ -175,32 +184,37 @@ class CSG(object):
         # sort by index
         sortedVertexIndex = sorted(vertexIndexMap.items(),
                                    key=operator.itemgetter(1))
-        verts = [v[0] for v in sortedVertexIndex]
+        verts = []
+        for v, i in sortedVertexIndex:
+            p = []
+            for c in v.split(','):
+                p.append(float(c) - offset)
+            verts.append(tuple(p))
         return verts, polys, count
 
     def saveVTK(self, filename):
         """
         Save polygons in VTK file.
         """
-        f = file(filename, 'w')
-        print >> f, '# vtk DataFile Version 3.0'
-        print >> f, 'pycsg output'
-        print >> f, 'ASCII'
-        print >> f, 'DATASET POLYDATA'
+        with open(filename, 'w') as f:
+            f.write('# vtk DataFile Version 3.0\n')
+            f.write('pycsg output\n')
+            f.write('ASCII\n')
+            f.write('DATASET POLYDATA\n')
         
-        verts, cells, count = self.toVerticesAndPolygons()
+            verts, cells, count = self.toVerticesAndPolygons()
 
-        print >> f, 'POINTS {} float'.format(len(verts))
-        for v in verts:
-            print >> f, '{} {} {}'.format(v[0], v[1], v[2])
-        numCells = len(cells)
-        print >> f, 'POLYGONS {} {}'.format(numCells, count + numCells)
-        for cell in cells:
-            print >> f, '{} '.format(len(cell)),
-            for index in cell:
-                print >> f, '{} '.format(index),
-            print >> f
-        
+            f.write('POINTS {0} float\n'.format(len(verts)))
+            for v in verts:
+                f.write('{0} {1} {2}\n'.format(v[0], v[1], v[2]))
+            numCells = len(cells)
+            f.write('POLYGONS {0} {1}\n'.format(numCells, count + numCells))
+            for cell in cells:
+                f.write('{0} '.format(len(cell)))
+                for index in cell:
+                    f.write('{0} '.format(index))
+                f.write('\n')
+
     def union(self, csg):
         """
         Return a new CSG solid representing space in either this solid or in the
@@ -320,9 +334,9 @@ class CSG(object):
         if isinstance(radius, list): r = radius
         else: r = [radius, radius, radius]
 
-        polygons = map(
+        polygons = list(map(
             lambda v: Polygon( 
-                map(lambda i: 
+                list(map(lambda i: 
                     Vertex(
                         Vector(
                             c.x + r[0] * (2 * bool(i & 1) - 1),
@@ -330,7 +344,7 @@ class CSG(object):
                             c.z + r[2] * (2 * bool(i & 4) - 1)
                         ), 
                         None
-                    ), v[0])),
+                    ), v[0]))),
                     [
                         [[0, 4, 6, 2], [-1, 0, 0]],
                         [[1, 3, 7, 5], [+1, 0, 0]],
@@ -338,7 +352,7 @@ class CSG(object):
                         [[2, 6, 7, 3], [0, +1, 0]],
                         [[0, 2, 3, 1], [0, 0, -1]],
                         [[4, 5, 7, 6], [0, 0, +1]]
-                    ])
+                    ]))
         return CSG.fromPolygons(polygons)
         
     @classmethod
@@ -366,24 +380,73 @@ class CSG(object):
         polygons = []
         def appendVertex(vertices, theta, phi):
             d = Vector(
-                center[0] + r * math.cos(theta) * math.sin(phi),
-                center[1] + r * math.cos(phi),
-                center[2] + r * math.sin(theta) * math.sin(phi))
+                math.cos(theta) * math.sin(phi),
+                math.cos(phi),
+                math.sin(theta) * math.sin(phi))
             vertices.append(Vertex(c.plus(d.times(r)), d))
             
         dTheta = math.pi * 2.0 / float(slices)
         dPhi = math.pi / float(stacks)
-        for i in range(0, slices):
-            for j in range(0, stacks):
-                vertices = []
-                appendVertex(vertices, i * dTheta, j * dPhi)
-                i1, j1 = (i + 1) % slices, j + 1
-                if j > 0:
-                    appendVertex(vertices, i1 * dTheta, j * dPhi)
-                if j < stacks - 1:
-                    appendVertex(vertices, i1 * dTheta, j1 * dPhi)
-                appendVertex(vertices, i * dTheta, j1 * dPhi)
-                polygons.append(Polygon(vertices))
+
+        j0 = 0
+        j1 = j0 + 1
+        for i0 in range(0, slices):
+            i1 = i0 + 1
+            #  +--+
+            #  | /
+            #  |/
+            #  +
+            vertices = []
+            appendVertex(vertices, i0 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i1 * dTheta, j1 * dPhi)
+            appendVertex(vertices, i0 * dTheta, j1 * dPhi)
+            polygons.append(Polygon(vertices))
+
+        j0 = stacks - 1
+        j1 = j0 + 1
+        for i0 in range(0, slices):
+            i1 = i0 + 1
+            #  +
+            #  |\
+            #  | \
+            #  +--+
+            vertices = []
+            appendVertex(vertices, i0 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i1 * dTheta, j0 * dPhi)
+            appendVertex(vertices, i0 * dTheta, j1 * dPhi)
+            polygons.append(Polygon(vertices))
+            
+        for j0 in range(1, stacks - 1):
+            j1 = j0 + 0.5
+            j2 = j0 + 1
+            for i0 in range(0, slices):
+                i1 = i0 + 0.5
+                i2 = i0 + 1
+                #  +---+
+                #  |\ /|
+                #  | x |
+                #  |/ \|
+                #  +---+
+                verticesN = []
+                appendVertex(verticesN, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesN, i2 * dTheta, j2 * dPhi)
+                appendVertex(verticesN, i0 * dTheta, j2 * dPhi)
+                polygons.append(Polygon(verticesN))
+                verticesS = []
+                appendVertex(verticesS, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesS, i0 * dTheta, j0 * dPhi)
+                appendVertex(verticesS, i2 * dTheta, j0 * dPhi)
+                polygons.append(Polygon(verticesS))
+                verticesW = []
+                appendVertex(verticesW, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesW, i0 * dTheta, j2 * dPhi)
+                appendVertex(verticesW, i0 * dTheta, j0 * dPhi)
+                polygons.append(Polygon(verticesW))
+                verticesE = []
+                appendVertex(verticesE, i1 * dTheta, j1 * dPhi)
+                appendVertex(verticesE, i2 * dTheta, j0 * dPhi)
+                appendVertex(verticesE, i2 * dTheta, j2 * dPhi)
+                polygons.append(Polygon(verticesE))
                 
         return CSG.fromPolygons(polygons)
     
